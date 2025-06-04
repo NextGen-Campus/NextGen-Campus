@@ -2,12 +2,11 @@ import { useState } from 'react'
 import Navbar from './components/Navbar'
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
-    <>
+    <div className='flex flex-col bg-slate-700 min-h-screen'>
       <Navbar/>
-    </>
+    </div>
   )
 }
 
