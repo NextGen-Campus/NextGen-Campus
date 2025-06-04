@@ -1,9 +1,20 @@
 import React, { useState } from "react";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
+import { useFirebase } from "../context/Firebase";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
-  const [user, setUser] = useState(null); // Replace with real auth state
+  const firebase = useFirebase();
+  const navigate = useNavigate();
+  const user = firebase.user; // Replace with real auth state
   const [isOpen, setIsOpen] = useState(false); // Mobile menu toggle
+  const [dropdownOpen, setDropdownOpen] = useState(false); // Dropdown toggle
+
+  const handleLogout = async () => {
+    // Implement logout functionality here
+    await firebase.logOutUser();
+    console.log("Logging out");
+  };
 
   return (
     <nav className="bg-white shadow-md">
@@ -20,21 +31,47 @@ const Navbar = () => {
 
           {/* Desktop Nav */}
           <div className="hidden md:flex space-x-6 text-gray-700">
-            <Link to="/" className="hover:text-blue-600">Home</Link>
-            <Link to="/about" className="hover:text-blue-600">About</Link>
-            <Link to="/events" className="hover:text-blue-600">Events</Link>
+            <Link to="/" className="hover:text-blue-600">
+              Home
+            </Link>
+            <Link to="/about" className="hover:text-blue-600">
+              About
+            </Link>
+            <Link to="/events" className="hover:text-blue-600">
+              Events
+            </Link>
           </div>
 
           {/* Profile / Login */}
-          <div className="hidden md:flex">
+          <div className="hidden md:flex relative">
             {user ? (
-              <Link to="/profile">
+              <div>
                 <img
-                  src={user.avatar || '/default-avatar.png'}
+                  src={
+                    `${user?.reloadUserInfo?.photoUrl}`||
+                    "https://png.pngtree.com/png-vector/20220628/ourmid/pngtree-user-profile-avatar-vector-admin-png-image_5289693.png"
+                  }
                   alt="User"
-                  className="h-10 w-10 rounded-full object-cover"
+                  className="h-10 w-10 rounded-full object-cover cursor-pointer"
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
                 />
-              </Link>
+                {dropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg">
+                    <button
+                      onClick={(e) => navigate('/profile')}
+                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    >
+                      Profile
+                    </button>
+                    <button
+                      onClick={() => handleLogout()}
+                      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-red-500 hover:text-white"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <Link
                 to="/login"
@@ -60,9 +97,19 @@ const Navbar = () => {
                 xmlns="http://www.w3.org/2000/svg"
               >
                 {isOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
                 )}
               </svg>
             </button>
@@ -73,12 +120,38 @@ const Navbar = () => {
       {/* Mobile Nav Links */}
       {isOpen && (
         <div className="flex flex-col items-center md:hidden px-4 pb-4 space-y-2 text-gray-700">
-          <Link to="/" onClick={() => setIsOpen(false)} className="block hover:text-blue-600">Home</Link>
-          <Link to="/about" onClick={() => setIsOpen(false)} className="block hover:text-blue-600">About</Link>
-          <Link to="/events" onClick={() => setIsOpen(false)} className="block hover:text-blue-600">Events</Link>
+          <Link
+            to="/"
+            onClick={() => setIsOpen(false)}
+            className="block hover:text-blue-600"
+          >
+            Home
+          </Link>
+          <Link
+            to="/about"
+            onClick={() => setIsOpen(false)}
+            className="block hover:text-blue-600"
+          >
+            About
+          </Link>
+          <Link
+            to="/events"
+            onClick={() => setIsOpen(false)}
+            className="block hover:text-blue-600"
+          >
+            Events
+          </Link>
           {user ? (
-            <Link to="/profile" onClick={() => setIsOpen(false)} className="flex items-center space-x-2 mt-2">
-              <img src={user.avatar || '/default-avatar.png'} alt="User" className="h-8 w-8 rounded-full object-cover" />
+            <Link
+              to="/profile"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center space-x-2 mt-2"
+            >
+              <img
+                src={user.avatar || "/default-avatar.png"}
+                alt="User"
+                className="h-8 w-8 rounded-full object-cover"
+              />
               <span>{user.name || "Profile"}</span>
             </Link>
           ) : (
@@ -97,4 +170,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-

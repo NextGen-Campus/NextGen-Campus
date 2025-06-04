@@ -6,7 +6,8 @@ import {
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
-  onAuthStateChanged
+  onAuthStateChanged,
+  signOut 
 } from "firebase/auth";
 
 
@@ -43,15 +44,16 @@ export const FirebaseProvider = (props) => {
   }, []);
 
   const isLoggedIn = user ? true : false;
-
+  console.log(user);
+  
   const signUpUserEmailAndPassword = (email, password) => {
     createUserWithEmailAndPassword(firebaseAuth, email, password).catch(
       (error) => console.log("Error in Email and Passowrd Signup !! ..", error)
     );
   };
 
-  const signInUserEmailAndPassword = (email, passowrd) => {
-    signInWithEmailAndPassword(auth, email, password).catch((error) =>
+  const signInUserEmailAndPassword = (email, password) => {
+    signInWithEmailAndPassword(firebaseAuth, email, password).catch((error) =>
       console.log("Error in Email and Passowrd Signin !! ..", error)
     );
   };
@@ -66,6 +68,8 @@ export const FirebaseProvider = (props) => {
     signOut(firebaseAuth)
       .then(() => {
         console.log("Logged Out Successfully !!");
+        setUser(null);
+        
       })
       .catch((error) => {
         console.log("Error in SignOut !! ..", error);
@@ -75,6 +79,7 @@ export const FirebaseProvider = (props) => {
   return (
     <FirebaseContext.Provider
       value={{
+        user,
         signUpUserEmailAndPassword,
         signInUserEmailAndPassword,
         isLoggedIn,
